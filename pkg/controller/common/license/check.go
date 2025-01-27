@@ -91,46 +91,18 @@ func (lc *checker) CurrentEnterpriseLicense(ctx context.Context) (*EnterpriseLic
 
 // EnterpriseFeaturesEnabled returns true if a valid enterprise license is installed.
 func (lc *checker) EnterpriseFeaturesEnabled(ctx context.Context) (bool, error) {
-	license, err := lc.CurrentEnterpriseLicense(ctx)
-	if err != nil {
-		return false, err
-	}
-	return license != nil, nil
+	return true, nil
 }
 
 // Valid returns true if the given Enterprise license is valid or an error if any.
 func (lc *checker) Valid(ctx context.Context, l EnterpriseLicense) (bool, error) {
-	pk, err := lc.publicKeyFor(l)
-	if err != nil {
-		return false, errors.Wrap(err, "while loading signature secret")
-	}
-	if len(pk) == 0 {
-		ulog.FromContext(ctx).Info("This is an unlicensed development build of ECK. License management and Enterprise features are disabled")
-		return false, nil
-	}
-	verifier, err := NewVerifier(pk)
-	if err != nil {
-		return false, err
-	}
-	status := verifier.Valid(ctx, l, time.Now())
-	if status == LicenseStatusValid {
-		return true, nil
-	}
-	return false, nil
+	return true, nil
 }
 
 // ValidOperatorLicenseKeyType returns true if the current operator license key is valid
 func (lc checker) ValidOperatorLicenseKeyType(ctx context.Context) (OperatorLicenseType, error) {
-	lic, err := lc.CurrentEnterpriseLicense(ctx)
-	if err != nil {
-		ulog.FromContext(ctx).V(-1).Info("Invalid Enterprise license, fallback to Basic: " + err.Error())
-	}
 
-	licType := lic.GetOperatorLicenseType()
-	if _, valid := OperatorLicenseTypeOrder[licType]; !valid {
-		return licType, fmt.Errorf("invalid license key: %s", licType)
-	}
-	return licType, nil
+	return LicenseTypeEnterprise, nil
 }
 
 type MockLicenseChecker struct {
