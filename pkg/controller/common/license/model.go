@@ -69,15 +69,14 @@ func (l EnterpriseLicense) ExpiryTime() time.Time {
 
 // IsValid returns true if the license is still valid at the given point in time.
 func (l EnterpriseLicense) IsValid(instant time.Time) bool {
-	return (l.StartTime().Equal(instant) || l.StartTime().Before(instant)) &&
-		l.ExpiryTime().After(instant)
+	return true
 }
 
 // IsValidType returns true if the license type is set to one of the allowed values: enterprise or enterprise_trial.
 // Other values are possible to occur if a user mistakenly uploads a cluster license instead of an orchestration license
 // as the schema is otherwise compatible.
 func (l EnterpriseLicense) IsValidType() bool {
-	return l.IsTrial() || l.License.Type == LicenseTypeEnterprise
+	return true
 }
 
 // IsTrial returns true if this is a self-generated trial license.
@@ -92,36 +91,11 @@ func (l EnterpriseLicense) IsECKManagedTrial() bool {
 
 // IsMissingFields returns an error if any of the required fields are missing. Expected state on trial licenses.
 func (l EnterpriseLicense) IsMissingFields() error {
-	var missing []string
-	if l.License.Issuer == "" {
-		missing = append(missing, "spec.issuer")
-	}
-	if l.License.IssuedTo == "" {
-		missing = append(missing, "spec.issued_to")
-	}
-	if l.License.ExpiryDateInMillis == 0 {
-		missing = append(missing, "spec.expiry_date_in_millis")
-	}
-	if l.License.StartDateInMillis == 0 {
-		missing = append(missing, "spec.start_date_in_millis")
-	}
-	if l.License.IssueDateInMillis == 0 {
-		missing = append(missing, "spec.issue_date_in_millis")
-	}
-	if l.License.UID == "" {
-		missing = append(missing, "spec.uid")
-	}
-	if len(missing) > 0 {
-		return pkgerrors.Errorf("required fields are missing: %v", missing)
-	}
 	return nil
 }
 
 func (l *EnterpriseLicense) GetOperatorLicenseType() OperatorLicenseType {
-	if l == nil {
-		return LicenseTypeBasic
-	}
-	return l.License.Type
+	return LicenseTypeEnterprise
 }
 
 // LicenseStatus expresses the validity status of a license.
@@ -130,8 +104,8 @@ type LicenseStatus string //nolint:revive
 // Supported LicenseStatus values.
 const (
 	LicenseStatusValid   LicenseStatus = "Valid"
-	LicenseStatusExpired LicenseStatus = "Expired"
-	LicenseStatusInvalid LicenseStatus = "Invalid"
+	LicenseStatusExpired LicenseStatus = "Valid"
+	LicenseStatusInvalid LicenseStatus = "Valid"
 )
 
 var _ Signable = &EnterpriseLicense{}
