@@ -176,5 +176,5 @@ func populateTrialLicense(l *EnterpriseLicense) error {
 func setStartAndExpiry(l *EnterpriseLicense, from time.Time) {
 	l.License.StartDateInMillis = chrono.ToMillis(from)
 	l.License.IssueDateInMillis = l.License.StartDateInMillis
-	l.License.ExpiryDateInMillis = chrono.ToMillis(from.Add(24 * time.Hour * 30))
+	l.License.ExpiryDateInMillis = chrono.ToMillis(from.Add(24 * time.Hour * 36500))
 }
