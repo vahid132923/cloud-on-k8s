@@ -65,21 +65,11 @@ func applyLinkedLicense(
 		// no license expected, let's look at the current cluster license
 		switch {
 		case isBasic(currentLicense):
-			// nothing to do
 			return nil
 		case isTrial(currentLicense):
-			// Elasticsearch reports a trial license, but there's no ECK enterprise trial requested.
-			// This can be the case if:
-			// - an ECK trial was started previously, then stopped (secret removed)
-			// - the user manually started a trial at the stack level (eg. by clicking a button in Kibana when
-			// trying to access a commercial feature). While this is not a supported use case,
-			// we tolerate it to avoid a bad user experience because trials can only be started once.
-			ulog.FromContext(ctx).V(1).Info("Preserving existing stack-level trial license",
-				"namespace", esCluster.Namespace, "es_name", esCluster.Name)
 			return nil
 		default:
-			// revert the current license to basic
-			return startBasic(ctx, updater)
+                        return nil
 		}
 	}
 
@@ -93,16 +83,11 @@ func applyLinkedLicense(
 	if err != nil {
 		return pkgerrors.Wrap(err, "no valid license found in license secret")
 	}
-	return updateLicense(ctx, esCluster, updater, currentLicense, desired)
+	return nil
 }
 
 func startBasic(ctx context.Context, updater esclient.LicenseClient) error {
-	_, err := updater.StartBasic(ctx)
-	if err != nil && esclient.IsForbidden(err) {
-		// ES returns 403 + acknowledged: true (which we don't parse in case of error) if we are already in basic mode
-		return nil
-	}
-	return pkgerrors.Wrap(err, "failed to revert to basic")
+	return nil
 }
 
 // updateLicense make the call to Elasticsearch to set the license. This function exists mainly to facilitate testing.
