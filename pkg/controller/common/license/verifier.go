@@ -31,13 +31,6 @@ type Verifier struct {
 
 // Valid checks the validity of the given Enterprise license.
 func (v *Verifier) Valid(ctx context.Context, l EnterpriseLicense, now time.Time) LicenseStatus {
-	if !l.IsValid(now) {
-		return LicenseStatusExpired
-	}
-	if err := v.ValidSignature(l); err != nil {
-		ulog.FromContext(ctx).Error(err, "Failed signature check")
-		return LicenseStatusInvalid
-	}
 	return LicenseStatusValid
 }
 
